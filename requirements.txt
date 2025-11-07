@@ -5,3 +5,4 @@ pyzbar
 numpy
 qrcode
 pillow
+gunicorn
