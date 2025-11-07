@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Gallery</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #e74c3c;
+            --background-color: #f4f7f6;
+            --card-bg-color: #ffffff;
+            --text-color: #333;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            margin: 0;
+        }
+        .navbar {
+            background-color: white;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .navbar-brand a {
+            font-weight: 700;
+            font-size: 24px;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        .search-container {
+            position: relative;
+            width: 50%;
+            max-width: 500px;
+        }
+        #search-input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            border: 1px solid #ddd;
+            border-radius: 50px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        #search-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        .search-container .fa-search {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+        }
+        .container {
+            padding: 30px 40px;
+        }
+        .product-category h2 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+        }
+        .product-card {
+            background-color: var(--card-bg-color);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.1);
+        }
+        .product-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .card-content {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .card-content h5 {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0 0 10px;
+        }
+        .card-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+        }
+        .card-description {
+            color: #666;
+            font-size: 14px;
+            flex-grow: 1;
+            margin-bottom: 15px;
+        }
+        .btn-view {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+        .btn-view:hover {
+            background-color: #2980b9;
+        }
+        .no-results {
+            text-align: center;
+            padding: 50px;
+            font-size: 18px;
+            color: #777;
+            display: none; /* Hidden by default */
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand"><a href="{{ url_for('home') }}">SmartShop</a></div>
+        <div class="search-container">
+            <i class="fas fa-search"></i>
+            <input type="text" id="search-input" placeholder="Search for products...">
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div id="product-list">
+            {% for category, products in products_by_category.items() %}
+            <div class="product-category" data-category="{{ category }}">
+                <h2>{{ category }}</h2>
+                <div class="product-grid">
+                    {% for product in products %}
+                    <div class="product-card" data-name="{{ product.name|lower }}">
+                        <img src="{{ product.image if product.image else '/static/images/default.jpg' }}" alt="{{ product.name }}">
+                        <div class="card-content">
+                            <h5>{{ product.name }}</h5>
+                            <p class="card-price">₹{{ "%.2f"|format(product.price) }}</p>
+                            <p class="card-description">{{ product.description }}</p>
+                            <a href="{{ url_for('product_details', product_id=product.id) }}" class="btn-view">View Shelf Location</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div id="no-results" class="no-results">
+            <h3>No products found</h3>
+            <p>Try searching for something else.</p>
+        </div>
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('search-input');
+        const productCards = document.querySelectorAll('.product-card');
+        const productCategories = document.querySelectorAll('.product-category');
+        const noResultsEl = document.getElementById('no-results');
+
+        searchInput.addEventListener('keyup', () => {
+            const query = searchInput.value.toLowerCase().trim();
+            let resultsFound = false;
+
+            productCards.forEach(card => {
+                const productName = card.getAttribute('data-name');
+                if (productName.includes(query)) {
+                    card.style.display = 'flex';
+                    resultsFound = true;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            productCategories.forEach(category => {
+                const visibleCards = category.querySelectorAll('.product-card[style*="display: flex"]');
+                if (visibleCards.length > 0) {
+                    category.style.display = 'block';
+                } else {
+                    category.style.display = 'none';
+                }
+            });
+            
+            noResultsEl.style.display = resultsFound ? 'none' : 'block';
+        });
+    </script>
+</body>
+</html>

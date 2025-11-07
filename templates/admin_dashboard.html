@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ project_name }} - Admin Login</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            /* Changed to the bright Customer Login gradient */
+            background: linear-gradient(135deg, #3498db 0%, #e74c3c 100%); 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        .background-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            background: rgba(255, 255, 255, 0.05); /* Subtle overlay remains */
+        }
+        .container {
+            text-align: center;
+            background-color: #ffffff;
+            padding: 50px 40px; 
+            border-radius: 12px;
+            box-shadow: 0px 15px 50px rgba(0, 0, 0, 0.5); /* Adjusted shadow for light background */
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            z-index: 10;
+            transition: transform 0.3s ease;
+            border: 1px solid #e0e0e0;
+        }
+        .container:hover {
+             transform: translateY(-8px); 
+        }
+        h1 {
+            /* Changed color to the main brand blue */
+            color: #3498db; 
+            font-size: 32px; 
+            margin-bottom: 5px;
+            font-weight: 900;
+        }
+        h2 {
+            /* Changed color to the main brand red */
+            color: #e74c3c; 
+            font-size: 20px;
+            margin-bottom: 35px;
+            font-weight: 500;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 25px;
+            border: 2px solid #e5e7eb; 
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            font-size: 16px;
+            background-color: #f9fafb;
+        }
+        input[type="text"]:focus, input[type="password"]:focus {
+            border-color: #3b82f6; 
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
+            outline: none;
+        }
+        .btn-submit {
+            /* Used the main brand red accent */
+            background-color: #e74c3c; 
+            color: white;
+            border: none;
+            padding: 16px;
+            width: 100%;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            box-shadow: 0 6px 15px rgba(231, 76, 60, 0.5);
+        }
+        .btn-submit:hover {
+            background-color: #c0392b; 
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(231, 76, 60, 0.7);
+        }
+        .flash-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ project_name }}</h1>
+        <h2>Shopkeeper Access</h2>
+        
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-message">
+                    {% for message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- This form posts to the general login route, where the backend checks the is_admin status. -->
+        <form method="POST" action="{{ url_for('login') }}">
+            <input type="text" name="username" placeholder="Admin Username" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <input type="submit" class="btn-submit" value="Login to Dashboard">
+        </form>
+    </div>
+    
+    <div class="background-animation">
+        <canvas id="backgroundCanvas"></canvas>
+    </div>
+
+    <!-- JavaScript for the particle effect -->
+    <script>
+        const canvas = document.getElementById('backgroundCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particles = [];
+
+        class Particle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 3 + 0.5;
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * 0.5 - 0.25;
+                this.color = 'rgba(255, 255, 255, 0.5)';
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.size > 0.1) this.size -= 0.01;
+            }
+
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        function generateInitialParticles() {
+            for (let i = 0; i < 80; i++) {
+                particles.push(new Particle(Math.random() * canvas.width, Math.random() * canvas.height));
+            }
+        }
+
+        function createParticles(e) {
+            const xPos = e.clientX || (e.touches && e.touches[0].clientX) || canvas.width / 2;
+            const yPos = e.clientY || (e.touches && e.touches[0].clientY) || canvas.height / 2;
+            for (let i = 0; i < 5; i++) {
+                particles.push(new Particle(xPos, yPos));
+            }
+        }
+
+        function animateParticles() {
+            /* Changed transparent clear color to match the brighter gradient fade effect */
+            ctx.fillStyle = 'rgba(52, 152, 219, 0.1)'; 
+            ctx.fillRect(0, 0, canvas.width, canvas.height); 
+
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+                if (particles[i].size <= 0.1 || particles[i].x < 0 || particles[i].x > canvas.width || particles[i].y < 0 || particles[i].y > canvas.height) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+            requestAnimationFrame(animateParticles);
+        }
+
+        window.onload = generateInitialParticles;
+        window.addEventListener('mousemove', createParticles);
+        window.addEventListener('touchmove', createParticles);
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+        
+        animateParticles();
+    </script>
+</body>
+</html>

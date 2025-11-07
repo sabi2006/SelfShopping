@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Smart Shopping</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+        .navbar {
+            background-color: white;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 24px;
+            color: #3498db;
+        }
+        .navbar-menu a {
+            color: #555;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 15px;
+            border-radius: 8px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .navbar-menu a:hover {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .container {
+            padding: 50px;
+            text-align: center;
+        }
+        .welcome-header {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #3498db 0%, #e74c3c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .welcome-subheader {
+            font-size: 20px;
+            color: #777;
+            margin-bottom: 50px;
+        }
+        .features {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+        .feature-card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 40px;
+            width: 300px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-decoration: none;
+            color: inherit;
+        }
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.12);
+        }
+        .feature-card .icon {
+            font-size: 50px;
+            margin-bottom: 20px;
+        }
+        .scanner-icon { color: #3498db; }
+        .search-icon { color: #e74c3c; }
+
+        .feature-card h3 {
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+        .feature-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">SmartShop</div>
+        <div class="navbar-menu">
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="welcome-header">Welcome, {{ username }}!</h1>
+        <p class="welcome-subheader">Ready to start your smart shopping experience?</p>
+
+        <div class="features">
+            <a href="{{ url_for('scanner') }}" class="feature-card">
+                <div class="icon scanner-icon">
+                    <i class="fas fa-barcode"></i>
+                </div>
+                <h3>Scan Products</h3>
+                <p>Use your camera to scan barcodes and build your cart effortlessly.</p>
+            </a>
+
+            <a href="{{ url_for('search_page') }}" class="feature-card">
+                <div class="icon search-icon">
+                    <i class="fas fa-search-location"></i>
+                </div>
+                <h3>Find Products</h3>
+                <p>Browse the product gallery or search to find item locations in the store.</p>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

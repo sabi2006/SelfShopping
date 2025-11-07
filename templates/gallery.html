@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Gallery</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #3498db 0%, #e74c3c 100%);
+            font-family: 'Arial', sans-serif;
+        }
+        .container {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-top: 30px;
+        }
+        h1 {
+            color: #3498db;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        .product-category {
+            margin-bottom: 2.5rem;
+        }
+        .product-category h2 {
+            color: #2980b9;
+            font-size: 1.75rem;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 1rem;
+        }
+        .card {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        .card-img-top {
+            max-height: 180px;
+            object-fit: cover;
+            border-bottom: 2px solid #3498db;
+        }
+        .card-body {
+            background: #f9f9f9;
+            padding: 20px;
+        }
+        .card-title {
+            font-size: 1.25rem;
+            color: #333;
+            font-weight: bold;
+        }
+        .card-price {
+            font-size: 1.1rem;
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .card-text {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .btn-primary {
+            background-color: #3498db;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #2980b9;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: border-color 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+        }
+        /* Suggestions box */
+        #suggestions {
+            position: absolute;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            width: 95%;
+            z-index: 1000;
+            display: none;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        #suggestions div {
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+        #suggestions div:hover {
+            background: #f1f1f1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Product Gallery</h1>
+
+        <!-- Search bar -->
+        <div style="position:relative;">
+            <input type="search" id="search" placeholder="Search or get recommendations..." 
+                class="form-control mb-4" aria-label="Search products" autocomplete="off">
+            <div id="suggestions"></div>
+        </div>
+
+        <!-- Product list -->
+        <div id="product-list">
+            {% for category, items in products.items() %}
+                <div class="product-category">
+                    <h2>{{ category }}</h2>
+                    <div class="row">
+                        {% for product in items %}
+                            <div class="col-md-4 mb-4">
+                                <div class="card">
+                                    <img src="{{ product.image }}" class="card-img-top" alt="{{ product.name }}">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ product.name }}</h5>
+                                        <p class="card-price">₹{{ product.price }}</p>
+                                        <p class="card-text">{{ product.description }}</p>
+                                        <a href="{{ url_for('product_details', product_id=product.id) }}" class="btn btn-primary">View Shelf</a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        const searchInput = document.getElementById("search");
+        const suggestionsBox = document.getElementById("suggestions");
+
+        searchInput.addEventListener("input", async function() {
+            let query = this.value.trim().toLowerCase();
+            suggestionsBox.innerHTML = "";
+
+            if (query.length === 0) {
+                // Show recommended products when search is empty
+                let rec = await fetch("/predict").then(res => res.json());
+                rec.forEach(item => {
+                    let div = document.createElement("div");
+                    div.innerHTML = "⭐ Recommended: " + item;
+                    div.onclick = () => { searchInput.value = item; suggestionsBox.style.display = "none"; filterProducts(item); };
+                    suggestionsBox.appendChild(div);
+                });
+                suggestionsBox.style.display = rec.length > 0 ? "block" : "none";
+                return;
+            }
+
+            // Filter search results from visible product list
+            let products = document.querySelectorAll('.card');
+            let found = false;
+            products.forEach(function(product) {
+                let title = product.querySelector('.card-title').textContent.toLowerCase();
+                if (title.includes(query)) {
+                    product.parentElement.style.display = '';
+                    found = true;
+                } else {
+                    product.parentElement.style.display = 'none';
+                }
+            });
+
+            // Show "No results" or nothing
+            if (!found) {
+                let div = document.createElement("div");
+                div.innerHTML = "❌ No matching products";
+                suggestionsBox.appendChild(div);
+                suggestionsBox.style.display = "block";
+            } else {
+                suggestionsBox.style.display = "none";
+            }
+        });
+
+        function filterProducts(query) {
+            let products = document.querySelectorAll('.card');
+            products.forEach(function(product) {
+                let title = product.querySelector('.card-title').textContent.toLowerCase();
+                if (title.includes(query.toLowerCase())) {
+                    product.parentElement.style.display = '';
+                } else {
+                    product.parentElement.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

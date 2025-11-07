@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.name }} Details</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71; /* Highlight color */
+            --background-color: #f4f7f6;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 1000px;
+            width: 90%;
+            text-align: center;
+        }
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        .shelves-display {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .shelf-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .shelf-label {
+            font-weight: 600;
+            font-size: 18px;
+            color: #555;
+        }
+        .sector {
+            width: 120px;
+            height: 120px;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        .sector.highlighted {
+            border-style: solid;
+            border-color: var(--secondary-color);
+            background-color: #e8f5e9;
+            animation: pulse 1.5s infinite;
+        }
+        .sector.highlighted img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            margin-bottom: 5px;
+        }
+        .sector.highlighted p {
+            font-weight: 500;
+            font-size: 14px;
+            color: #333;
+            margin: 0;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(46, 204, 113, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+        }
+        .btn-back {
+            display: inline-block;
+            margin-top: 40px;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .btn-back:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Location for: <strong>{{ product.name }}</strong></h1>
+        <div class="shelves-display">
+            {% for shelf_num in range(1, 6) %}
+                <div class="shelf-column">
+                    <div class="shelf-label">Shelf {{ shelf_num }}</div>
+                    {% for sector_num in range(1, 6) %}
+                        {% set current_location = 'Row ' ~ shelf_num ~ '-Sector ' ~ sector_num %}
+                        <div class="sector {% if product.location == current_location %}highlighted{% endif %}">
+                            {% if product.location == current_location %}
+                                <img src="{{ product.image }}" alt="{{ product.name }}">
+                                <p>{{ product.name }}</p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+        <a href="{{ url_for('search_page') }}" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Gallery</a>
+    </div>
+</body>
+</html>

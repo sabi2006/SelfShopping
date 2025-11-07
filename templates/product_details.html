@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Location - {{ product.name }}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f4f4f4;
+            font-family: 'Arial', sans-serif;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card-header {
+            background-color: #007bff;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+        }
+        .card-body {
+            padding: 30px;
+            text-align: center;
+        }
+        .location-text {
+            font-size: 2rem;
+            color: #333;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .product-name {
+            font-size: 1.2rem;
+            color: #666;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        Shelf Location
+                    </div>
+                    <div class="card-body">
+                        <p class="product-name">The product:</p>
+                        <h2 class="text-primary">{{ product.name }}</h2>
+                        <p class="product-name mt-4">is located at:</p>
+                        <p class="location-text">{{ product.location }}</p>
+                        <a href="{{ url_for('search_page') }}" class="btn btn-secondary back-link">Back to Search</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
